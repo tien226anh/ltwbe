@@ -2,9 +2,6 @@ import re
 from typing import List
 
 from bson.objectid import ObjectId
-
-# from app.list_object.service import object_to_json
-from app.user.models import InterestedModel
 from db.init_db import get_collection_client
 
 client = get_collection_client("users")
@@ -58,12 +55,25 @@ async def find_user_by_id(user_id: str):
     return await client.find_one({"_id": user_id})
 
 
+async def add_book_cart(id: ObjectId, data: List[ObjectId]):
+    return await client.update_one(
+        {"_id": id}, {"$push": {"cart": {"$each": data}}}
+    )
+
+
 def user_entity(user) -> dict:
+    cart = []
+    if 'cart' in user:
+        for books_id in user['cart']:
+            cart.append(str(books_id))
+
     return {
         "_id": str(user["_id"]),
         "email": user["email"],
         "username": user["username"],
         "full_name": user["full_name"],
         "role": user["role"],
+        "hashed_password": user["hashed_password"],
         "avatar_url": user["avatar_url"] if "avatar_url" in user else None,
+        "cart": cart if "cart" in user else None,
     }

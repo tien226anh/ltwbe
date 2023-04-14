@@ -14,10 +14,8 @@ class UserModel(BaseModel):
     password: str
     full_name: str
     role: Role
-    # news_bookmarks: list[str]
-    # vital_list: list[str]
-    # interested_list: list[str]
-    # avatar_url: Optional[str]
+    cart: list[str]
+    avatar_url: Optional[str]
 
 
 class UserCreateModel(BaseModel):
@@ -33,7 +31,7 @@ class UserUpdateModel(BaseModel):
     password: Optional[str]
     full_name: Optional[str]
     role: Optional[Role]
-    # avatar_url: Optional[str]
+    avatar_url: Optional[str]
 
 
 class UserLoginModel(BaseModel):
@@ -44,7 +42,3 @@ class UserLoginModel(BaseModel):
 class UserChangePasswordModel(BaseModel):
     password: str
     new_password: str
-
-
-class InterestedModel(BaseModel):
-    id: Optional[str] = Field(...)

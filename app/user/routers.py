@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, List
 from bson import ObjectId
 from fastapi import APIRouter, Body, Depends, File, HTTPException, UploadFile, status
 from fastapi.responses import JSONResponse
@@ -7,7 +7,7 @@ from fastapi_jwt_auth import AuthJWT
 from app.auth.password import get_password_hash
 from app.user.models import Role, UserCreateModel, UserUpdateModel
 from app.user.services import count_users, create_user, delete_user, find_user_by_id, get_users, update_user, \
-    user_entity
+    user_entity, add_book_cart
 from db.init_db import get_collection_client
 
 router = APIRouter()
@@ -19,7 +19,7 @@ client = get_collection_client("users")
 async def create_new_user(body: UserCreateModel):
     user_dict = body.dict()
 
-    existing_user = await client.find_one({})
+    existing_user = await client.find_one({"username": user_dict["username"]})
 
     if existing_user:
         return JSONResponse(
@@ -103,6 +103,19 @@ async def delete(id: str):
     return JSONResponse(status_code=status.HTTP_202_ACCEPTED, content=None)
 
 
+@router.post("/cart")
+async def add_cart(
+        books: List[str] = Body(...), authorize: AuthJWT = Depends()
+):
+    authorize.jwt_required()
+    id_obj = ObjectId(authorize.get_jwt_subject())
+    list_books = []
+    for item in books:
+        list_books.append(ObjectId(item))
+    await add_book_cart(id_obj, list_books)
+    return JSONResponse(status_code=status.HTTP_201_CREATED, content='Successful add to cart')
+
+
 @router.post("/avatar")
 async def upload_avatar(file: UploadFile = File(...), authorize: AuthJWT = Depends()):
     authorize.jwt_required()
@@ -124,3 +137,4 @@ async def upload_avatar(file: UploadFile = File(...), authorize: AuthJWT = Depen
     return JSONResponse(
         status_code=status.HTTP_202_ACCEPTED, content=f"static/avatar/{file.filename}"
     )
+

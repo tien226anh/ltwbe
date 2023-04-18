@@ -34,6 +34,12 @@ async def find_books_by_filter_and_paginate(filter_books, skip: int, limit: int,
         books.append(book)
     return books
 
+async def find_books_not_paginate(filter_books):
+    books = []
+    async for book in client.find(filter_books).sort("_id"):
+        book = to_json(book)
+        books.append(book)
+    return books
 
 async def count_books(filter_books):
     return await client.count_documents(filter_books)

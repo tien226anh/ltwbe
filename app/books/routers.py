@@ -4,7 +4,8 @@ from bson import ObjectId
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status, Body
 from fastapi.responses import JSONResponse
 from app.books.models import AddBookModel, UpdateModel, BookModel
-from app.books.services import count_books, create_book, find_books_by_filter_and_paginate, update_book
+from app.books.services import count_books, create_book, find_books_by_filter_and_paginate, update_book, \
+    find_books_not_paginate
 
 # from fastapi_jwt_auth import AuthJWT
 
@@ -33,7 +34,17 @@ async def get_books(title: str = '', skip=1, limit=20):
     return JSONResponse(
         status_code=status.HTTP_200_OK, content={"result": books, "total_record": count, }
     )
-
+# https://dev.to/franciscomendes10866/how-to-create-a-table-with-pagination-in-react-4lpd
+# Paginate
+@router.get("/all")
+async def get_all(title: str = ''):
+    query = {}
+    if title:
+        query = {"title": {"$regex": f'{title}', "$options": "i"}}
+    books = await find_books_not_paginate(query)
+    return JSONResponse(
+        status_code=status.HTTP_200_OK, content=books,
+    )
 
 @router.put("/{book_id}")
 async def edit_book(book_id: str, data: BookModel = Body(...)):

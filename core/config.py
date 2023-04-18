@@ -5,7 +5,7 @@ from pydantic import AnyHttpUrl, BaseSettings
 class Settings(BaseSettings):
     APP_TITLE: str = "BOOK API"
     APP_ORIGINS: List[AnyHttpUrl] = [
-        "http://localhost:5173",
+        "http://localhost:3000",
     ]
     
     APP_HOST: str = "0.0.0.0"

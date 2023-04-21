@@ -4,7 +4,14 @@ from bson import ObjectId
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status, Body
 from fastapi.responses import JSONResponse
 from app.books.models import AddBookModel, UpdateModel, BookModel
-from app.books.services import count_books, create_book, find_books_by_filter_and_paginate, update_book, find_books_not_paginate
+from app.books.services import (
+    count_books,
+    create_book,
+    find_books_by_filter_and_paginate,
+    find_by_id,
+    update_book,
+    find_books_not_paginate,
+)
 
 # from fastapi_jwt_auth import AuthJWT
 
@@ -15,19 +22,11 @@ router = APIRouter()
 client = get_collection_client("books")
 
 
-@router.post("/")
-async def add_new_book(body: AddBookModel):
-    await create_book(body)
-    return JSONResponse(
-        status_code=status.HTTP_201_CREATED, content="Add new book successful"
-    )
-
-
 @router.get("/")
 async def get_books(
-    title: str = '',
-    author: str = '',
-    category: str = '',
+    title: str = "",
+    author: str = "",
+    category: str = "",
     skip: int = 1,
     limit: int = 20,
 ):
@@ -44,17 +43,37 @@ async def get_books(
         status_code=status.HTTP_200_OK,
         content={"result": books, "total_record": count},
     )
-# https://dev.to/franciscomendes10866/how-to-create-a-table-with-pagination-in-react-4lpd
-# Paginate
-@router.get("/all")
-async def get_all(title: str = ''):
-    query = {}
-    if title:
-        query = {"title": {"$regex": f'{title}', "$options": "i"}}
-    books = await find_books_not_paginate(query)
+
+
+@router.post("/")
+async def add_new_book(body: AddBookModel):
+    await create_book(body)
     return JSONResponse(
-        status_code=status.HTTP_200_OK, content=books,
+        status_code=status.HTTP_201_CREATED, content="Add new book successful"
     )
+
+
+@router.get("/book_detail/{id}")
+async def get_detail(id: str):
+    detail = await find_by_id(id)
+    if detail:
+        return detail
+    return HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail='Not found'
+    )
+
+# @router.get("/all")
+# async def get_all(title: str = ""):
+#     query = {}
+#     if title:
+#         query = {"title": {"$regex": f"{title}", "$options": "i"}}
+#     books = await find_books_not_paginate(query)
+#     return JSONResponse(
+#         status_code=status.HTTP_200_OK,
+#         content=books,
+#     )
+
 
 @router.put("/{book_id}")
 async def edit_book(book_id: str, data: BookModel = Body(...)):

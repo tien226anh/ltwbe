@@ -3,14 +3,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 from pydash import pick
-from fastapi.templating import Jinja2Templates
 
 from app.auth.password import get_password_hash, verify_and_update
 from app.user.models import UserChangePasswordModel, UserLoginModel
 from app.user.services import get_user_by_id, read_user_by_username, update_user
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
 
 
 @router.post("/login")

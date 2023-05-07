@@ -28,7 +28,6 @@ class UserCreateModel(BaseModel):
 
 class UserUpdateModel(BaseModel):
     username: Optional[str]
-    password: Optional[str]
     full_name: Optional[str]
     role: Optional[Role]
     avatar_url: Optional[str]

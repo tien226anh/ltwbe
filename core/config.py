@@ -6,8 +6,9 @@ class Settings(BaseSettings):
     APP_TITLE: str = "BOOK API"
     APP_ORIGINS: List[AnyHttpUrl] = [
         "http://localhost:3000",
+        "http://localhost:5173",
     ]
-    
+    # APP_ORIGINS: List[AnyHttpUrl] = ["*"]
     APP_HOST: str = "0.0.0.0"
     APP_PORT: int = 8000
     APP_STATIC_DIR: str = "static"

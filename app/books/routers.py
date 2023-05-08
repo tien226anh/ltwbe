@@ -63,6 +63,26 @@ async def get_detail(id: str):
         detail='Not found'
     )
 
+@router.post("/avatar")
+async def upload_cover(id: str, file: UploadFile = File(...)):
+    book_id = ObjectId(id)
+    try:
+        content = await file.read()
+        with open(f"static/bookscover.{file.filename}", "wb") as f:
+            f.write(content)
+    except Exception as error:
+        return HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail = "There was an error when uploading the file",
+        )
+    finally:
+        await file.close()
+    await update_book(book_id,  {"cover": f"static/bookscover.{file.filename}"})
+    return JSONResponse(
+        status_code=status.HTTP_202_ACCEPTED,
+        content=f"static/bookscover.{file.filename}",
+    )
+
 # @router.get("/all")
 # async def get_all(title: str = ""):
 #     query = {}

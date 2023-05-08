@@ -9,7 +9,8 @@ class Settings(BaseSettings):
         "http://localhost:5173",
     ]
     # APP_ORIGINS: List[AnyHttpUrl] = ["*"]
-    APP_HOST: str = "0.0.0.0"
+    # APP_HOST: str = "0.0.0.0"
+    APP_HOST: str = "localhost"
     APP_PORT: int = 8000
     APP_STATIC_DIR: str = "static"
     

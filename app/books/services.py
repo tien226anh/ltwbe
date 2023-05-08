@@ -67,4 +67,5 @@ def book_entity(book):
         "page_number": str(book["page_number"]),
         "category": str(book["category"]),
         "cover_url": str(book["cover_url"]),
+        "price": str(book["price"])
     }

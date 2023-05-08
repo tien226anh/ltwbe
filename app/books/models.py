@@ -10,6 +10,7 @@ class BookModel(BaseModel):
     page_number: Optional[int]
     category: Optional[str]
     cover: Optional[str]
+    price: Optional[int]
 
 
 class AddBookModel(BaseModel):
@@ -19,6 +20,7 @@ class AddBookModel(BaseModel):
     release_date: str
     page_number: int
     category: str
+    price: int
 
 
 class UpdateModel(BaseModel):
@@ -29,3 +31,4 @@ class UpdateModel(BaseModel):
     page_number: Optional[int]
     category: Optional[str]
     cover: Optional[str]
+    price: Optional[int]

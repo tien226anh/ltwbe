@@ -41,3 +41,8 @@ class UserLoginModel(BaseModel):
 class UserChangePasswordModel(BaseModel):
     password: str
     new_password: str
+
+
+class CartModel(BaseModel):
+    book_id: str
+    booksnum: int

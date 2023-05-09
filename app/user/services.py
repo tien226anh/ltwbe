@@ -55,8 +55,15 @@ async def find_user_by_id(user_id: str):
     return await client.find_one({"_id": user_id})
 
 
-async def add_book_cart(id: ObjectId, data: List[ObjectId]):
-    return await client.update_one({"_id": id}, {"$push": {"cart": {"$each": data}}})
+async def add_to_cart(id: ObjectId, data: List[dict]):
+    return await client.update_one({"_id": id}, {"$set": {"cart": data}})
+
+
+async def delete_from_cart(user_id: ObjectId, book_ids: List[ObjectId]):
+    return await client.update_one(
+        {"_id": user_id},
+        {"$pull": {"cart": {"book_id": {"$in": book_ids}}}},
+    )
 
 
 def user_entity(user) -> dict:

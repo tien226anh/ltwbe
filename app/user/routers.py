@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 
 from app.auth.password import get_password_hash
-from app.user.models import Role, UserCreateModel, UserUpdateModel
+from app.user.models import Role, UserCreateModel, UserUpdateModel, CartModel
 from app.user.services import (
     count_users,
     create_user,
@@ -14,7 +14,8 @@ from app.user.services import (
     get_users,
     update_user,
     user_entity,
-    add_book_cart,
+    add_to_cart,
+    delete_from_cart,
 )
 from db.init_db import get_collection_client
 
@@ -114,15 +115,31 @@ async def delete(id: str):
 
 
 @router.post("/cart")
-async def add_cart(books: List[str] = Body(...), authorize: AuthJWT = Depends()):
+async def add_cart(books: List[CartModel] = Body(...), authorize: AuthJWT = Depends()):
     authorize.jwt_required()
-    id_obj = ObjectId(authorize.get_jwt_subject())
+    user_id = ObjectId(authorize.get_jwt_subject())
     list_books = []
     for item in books:
-        list_books.append(ObjectId(item))
-    await add_book_cart(id_obj, list_books)
+        list_books.append(
+            {
+                "book_id": (ObjectId(item.book_id)),
+                "booksnum": item.booksnum,
+            }
+        )
+    await add_to_cart(user_id, list_books)
     return JSONResponse(
         status_code=status.HTTP_201_CREATED, content="Successful add to cart"
+    )
+
+
+@router.delete("/cart")
+async def delete_cart_items(book_ids: List[str], authorize: AuthJWT = Depends()):
+    authorize.jwt_required()
+    user_id = ObjectId(authorize.get_jwt_subject())
+    book_object_ids = [ObjectId(book_id) for book_id in book_ids]
+    await delete_from_cart(user_id, book_object_ids)
+    return JSONResponse(
+        status_code=status.HTTP_200_OK, content="Successfully deleted items form cart"
     )
 
 

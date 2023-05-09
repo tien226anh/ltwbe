@@ -40,7 +40,8 @@ async def find_books_by_filter_and_paginate(
     offset = (skip - 1) * limit if skip > 0 else 0
     books = []
     async for book in client.find(filter_books).sort("_id").skip(offset).limit(limit):
-        book = to_json(book)
+        # book = to_json(book)
+        book = book_entity(book)
         books.append(book)
     return books
 
@@ -66,6 +67,6 @@ def book_entity(book):
         "release_date": str(book["release_date"]),
         "page_number": str(book["page_number"]),
         "category": str(book["category"]),
-        "cover_url": str(book["cover_url"]),
-        "price": str(book["price"])
+        "cover_url": str(book["cover_url"]) if "cover_url" in book else None,
+        "price": str(book["price"]) if "price" in book else None
     }

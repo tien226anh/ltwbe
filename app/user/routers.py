@@ -141,7 +141,7 @@ async def upload_avatar(file: UploadFile = File(...), authorize: AuthJWT = Depen
         )
     finally:
         await file.close()
-    await update_user(user_id, {"avatar": f"static/avatar/{file.filename}"})
+    await update_user(user_id, {"avatar_url": f"static/avatar/{file.filename}"})
     return JSONResponse(
         status_code=status.HTTP_202_ACCEPTED,
         content=f"static/avatar/{file.filename}",

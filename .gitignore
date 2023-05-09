@@ -176,3 +176,10 @@ secrets/
 vosint_ingestion/nlp/
 .idea/
 .vscode/
+
+static/bookscover/*.jpg
+static/bookscover/*.png
+static/bookscover/*.svg
+static/avatar/*.jpg
+static/avatar/*.png
+static/avatar/*.svg

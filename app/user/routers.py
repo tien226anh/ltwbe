@@ -6,8 +6,16 @@ from fastapi_jwt_auth import AuthJWT
 
 from app.auth.password import get_password_hash
 from app.user.models import Role, UserCreateModel, UserUpdateModel
-from app.user.services import count_users, create_user, delete_user, find_user_by_id, get_users, update_user, \
-    user_entity, add_book_cart
+from app.user.services import (
+    count_users,
+    create_user,
+    delete_user,
+    find_user_by_id,
+    get_users,
+    update_user,
+    user_entity,
+    add_book_cart,
+)
 from db.init_db import get_collection_client
 
 router = APIRouter()
@@ -28,7 +36,9 @@ async def create_new_user(body: UserCreateModel):
     user_dict["hashed_password"] = get_password_hash(user_dict["password"])
     user_dict.pop("password")
     await create_user(user_dict)
-    return JSONResponse(status_code=status.HTTP_200_OK, content="Succesful create new user")
+    return JSONResponse(
+        status_code=status.HTTP_200_OK, content="Succesful create new user"
+    )
 
 
 @router.get("/me")
@@ -44,11 +54,11 @@ async def get_me(authorize: AuthJWT = Depends()):
 
 @router.get("/")
 async def get_all(
-        name="",
-        role: Union[Role, None] = None,
-        authorize: AuthJWT = Depends(),
-        skip=0,
-        limit=20,
+    name="",
+    role: Union[Role, None] = None,
+    authorize: AuthJWT = Depends(),
+    skip=0,
+    limit=20,
 ):
     authorize.jwt_required()
 
@@ -73,7 +83,7 @@ async def get_all(
 
 @router.put("/me")
 async def update_me(
-        user_data: UserUpdateModel = Body(...), authorize: AuthJWT = Depends()
+    user_data: UserUpdateModel = Body(...), authorize: AuthJWT = Depends()
 ):
     authorize.jwt_required()
     user_id = ObjectId(authorize.get_jwt_subject())
@@ -104,23 +114,22 @@ async def delete(id: str):
 
 
 @router.post("/cart")
-async def add_cart(
-        books: List[str] = Body(...), authorize: AuthJWT = Depends()
-):
+async def add_cart(books: List[str] = Body(...), authorize: AuthJWT = Depends()):
     authorize.jwt_required()
     id_obj = ObjectId(authorize.get_jwt_subject())
     list_books = []
     for item in books:
         list_books.append(ObjectId(item))
     await add_book_cart(id_obj, list_books)
-    return JSONResponse(status_code=status.HTTP_201_CREATED, content='Successful add to cart')
+    return JSONResponse(
+        status_code=status.HTTP_201_CREATED, content="Successful add to cart"
+    )
 
 
 @router.post("/avatar")
 async def upload_avatar(file: UploadFile = File(...), authorize: AuthJWT = Depends()):
     authorize.jwt_required()
     user_id = ObjectId(authorize.get_jwt_subject())
-
     try:
         content = await file.read()
         with open(f"static/avatar/{file.filename}", "wb") as f:
@@ -128,13 +137,12 @@ async def upload_avatar(file: UploadFile = File(...), authorize: AuthJWT = Depen
     except Exception as error:
         return HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="There was an error when uploading the file",
+            detail="There was an error when trying uploading the file",
         )
     finally:
         await file.close()
-
-    await update_user(user_id, {"avatar_url": f"static/{file.filename}"})
+    await update_user(user_id, {"avatar": f"static/avatar/{file.filename}"})
     return JSONResponse(
-        status_code=status.HTTP_202_ACCEPTED, content=f"static/avatar/{file.filename}"
+        status_code=status.HTTP_202_ACCEPTED,
+        content=f"static/avatar/{file.filename}",
     )
-

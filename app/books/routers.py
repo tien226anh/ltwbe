@@ -58,12 +58,10 @@ async def get_detail(id: str):
     detail = await find_by_id(id)
     if detail:
         return detail
-    return HTTPException(
-        status_code=status.HTTP_403_FORBIDDEN,
-        detail='Not found'
-    )
+    return HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not found")
 
-@router.post("/avatar")
+
+@router.post("/cover")
 async def upload_cover(id: str, file: UploadFile = File(...)):
     book_id = ObjectId(id)
     try:
@@ -73,15 +71,16 @@ async def upload_cover(id: str, file: UploadFile = File(...)):
     except Exception as error:
         return HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail = "There was an error when uploading the file",
+            detail="There was an error when uploading the file",
         )
     finally:
         await file.close()
-    await update_book(book_id,  {"cover_url": f"static/bookscover/{file.filename}"})
+    await update_book(book_id, {"cover_url": f"static/bookscover/{file.filename}"})
     return JSONResponse(
         status_code=status.HTTP_202_ACCEPTED,
-        content=f"static/bookscover.{file.filename}",
+        content=f"static/bookscover/{file.filename}",
     )
+
 
 # @router.get("/all")
 # async def get_all(title: str = ""):

@@ -68,5 +68,5 @@ def book_entity(book):
         "page_number": str(book["page_number"]),
         "category": str(book["category"]),
         "cover_url": str(book["cover_url"]) if "cover_url" in book else None,
-        "price": str(book["price"]) if "price" in book else None
+        "price": str(book["price"]) if "price" in book else None,
     }

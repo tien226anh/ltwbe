@@ -56,15 +56,13 @@ async def find_user_by_id(user_id: str):
 
 
 async def add_book_cart(id: ObjectId, data: List[ObjectId]):
-    return await client.update_one(
-        {"_id": id}, {"$push": {"cart": {"$each": data}}}
-    )
+    return await client.update_one({"_id": id}, {"$push": {"cart": {"$each": data}}})
 
 
 def user_entity(user) -> dict:
     cart = []
-    if 'cart' in user:
-        for books_id in user['cart']:
+    if "cart" in user:
+        for books_id in user["cart"]:
             cart.append(str(books_id))
 
     return {

@@ -18,12 +18,13 @@ if settings.APP_ORIGINS:
     app.add_middleware(
         CORSMiddleware,
         # allow_origins=[str(origin) for origin in settings.APP_ORIGINS],
-        allow_origins=['*'],
+        allow_origins=["*"],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    
+
+
 class Settings(BaseModel):
     expires = datetime.timedelta(days=1)
     authjwt_algorithm: str = "RS512"
@@ -35,21 +36,26 @@ class Settings(BaseModel):
     # Disable CSRF Protection for this example. default is True
     authjwt_cookie_csrf_protect: bool = False
 
+
 @AuthJWT.load_config
 def get_config():
     return Settings()
+
 
 @app.exception_handler(AuthJWTException)
 def auth_exception_handler(request: Request, exc: AuthJWTException):
     return JSONResponse(status_code=exc.status_code, content={"detail": exc.message})
 
+
 @app.on_event("startup")
 async def on_startup():
     await init_db.connect_db()
 
+
 @app.on_event("shutdown")
 async def on_shutdown():
     await init_db.close_db()
+
 
 """
     Start file server for downloading static files.

@@ -173,8 +173,5 @@ poetry.toml
 # End of https://www.toptal.com/developers/gitignore/api/python
 secrets/
 #static/
-vosint_ingestion/nlp/
 .idea/
 .vscode/
-
-static/

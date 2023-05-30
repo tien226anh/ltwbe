@@ -79,7 +79,7 @@ async def upload_cover(id: str, file: UploadFile = File(...)):
         )
     finally:
         await file.close()
-    await update_book(book_id, {"cover_url": f"static/bookscover/{file.filename}"})
+    await update_book(book_id, {"cover": f"static/bookscover/{file.filename}"})
     return JSONResponse(
         status_code=status.HTTP_202_ACCEPTED,
         content=f"static/bookscover/{file.filename}",

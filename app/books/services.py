@@ -1,5 +1,3 @@
-from typing import Optional
-
 from bson import ObjectId
 from fastapi import HTTPException, status
 
@@ -99,7 +97,7 @@ def book_entity(book):
         "release_date": str(book["release_date"]),
         "page_number": str(book["page_number"]),
         "category": str(book["category"]),
-        "cover_url": str(book["cover_url"]) if "cover_url" in book else None,
+        "cover": str(book["cover"]) if "cover" in book else None,
         "price": str(book["price"]) if "price" in book else None,
         "rating": rating if "rating" in book else None,
     }

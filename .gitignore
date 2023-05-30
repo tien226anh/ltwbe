@@ -175,3 +175,6 @@ secrets/
 #static/
 .idea/
 .vscode/
+*.jpg
+*.png
+*.jpeg

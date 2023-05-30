@@ -3,15 +3,19 @@ from typing import Optional
 from bson import ObjectId
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status, Body
 from fastapi.responses import JSONResponse
-from app.books.models import AddBookModel, UpdateModel, BookModel
+from fastapi_jwt_auth import AuthJWT
+
+from app.books.models import AddBookModel, RatingModel, UpdateModel, BookModel
 from app.books.services import (
     count_books,
     create_book,
     find_books_by_filter_and_paginate,
     find_by_id,
+    rating_book,
     update_book,
     find_books_not_paginate,
 )
+from app.user.services import find_user_by_id
 
 # from fastapi_jwt_auth import AuthJWT
 
@@ -79,6 +83,23 @@ async def upload_cover(id: str, file: UploadFile = File(...)):
     return JSONResponse(
         status_code=status.HTTP_202_ACCEPTED,
         content=f"static/bookscover/{file.filename}",
+    )
+
+
+@router.put("/book/rate/{book_id}")
+async def rate_book(
+    book_id: str,
+    rate_comment: RatingModel = Body(...),
+    authorize: AuthJWT = Depends(),
+):
+    authorize.jwt_required()
+    user_id = authorize.get_jwt_subject()
+    rate = rate_comment.rating
+    comment = rate_comment.comment
+    await rating_book(book_id, rate, comment, user_id)
+    return JSONResponse(
+        status_code=status.HTTP_201_CREATED,
+        content="Successfull rate the book",
     )
 
 

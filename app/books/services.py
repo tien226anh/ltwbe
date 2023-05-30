@@ -58,7 +58,39 @@ async def count_books(filter_books):
     return await client.count_documents(filter_books)
 
 
+async def rating_book(book_id: str, rate: float, comment: str, user_id: str):
+    book_id = ObjectId(book_id)
+    item_rate = {
+        "user_id": ObjectId(user_id),
+        "rate": rate,
+        "comment": comment,
+    }
+    # Find the book and its ratings
+    book = await client.find_one({"_id": book_id})
+    ratings = book.get("rating", [])
+    # Check if the user has already rated the book
+    for i, rating in enumerate(ratings):
+        if rating["user_id"] == item_rate["user_id"]:
+            if rating["rate"] == rate and rating["comment"] == comment:
+                # Rating is the same, no need to update
+                return
+            else:
+                # Replace the old rating with the new one
+                ratings[i] = item_rate
+                break
+    else:
+        # User hasn't rated the book before, add the new rating
+        ratings.append(item_rate)
+    # Update the book's ratings
+    await client.update_one({"_id": book_id}, {"$set": {"rating": ratings}})
+
+
 def book_entity(book):
+    rating = []
+    if "rating" in book:
+        for users_id in book["rating"]:
+            rating.append(book[users_id])
+
     return {
         "_id": str(book["_id"]),
         "title": str(book["title"]),
@@ -69,4 +101,5 @@ def book_entity(book):
         "category": str(book["category"]),
         "cover_url": str(book["cover_url"]) if "cover_url" in book else None,
         "price": str(book["price"]) if "price" in book else None,
+        "rating": rating if "rating" in book else None,
     }

@@ -32,3 +32,8 @@ class UpdateModel(BaseModel):
     category: Optional[str]
     cover: Optional[str]
     price: Optional[int]
+
+
+class RatingModel(BaseModel):
+    rating: float
+    comment: str

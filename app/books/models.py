@@ -24,13 +24,12 @@ class AddBookModel(BaseModel):
 
 
 class UpdateModel(BaseModel):
-    title: str
-    author: str
+    title: Optional[str]
+    author: Optional[str]
     describe: Optional[str]
     release_date: Optional[str]
     page_number: Optional[int]
     category: Optional[str]
-    cover: Optional[str]
     price: Optional[int]
 
 

@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 
 from app.auth.password import get_password_hash
+from app.books.utils import to_json
 from app.user.models import Role, UserCreateModel, UserUpdateModel, CartModel
 from app.user.services import (
     count_users,
@@ -50,7 +51,7 @@ async def get_me(authorize: AuthJWT = Depends()):
     if user is None:
         return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=None)
 
-    return JSONResponse(status_code=status.HTTP_200_OK, content=user_entity(user))
+    return JSONResponse(status_code=status.HTTP_200_OK, content=to_json(user))
 
 
 @router.get("/")
@@ -58,8 +59,8 @@ async def get_all(
     name="",
     role: Union[Role, None] = None,
     authorize: AuthJWT = Depends(),
-    skip=0,
-    limit=20,
+    skip=1,
+    limit=10,
 ):
     authorize.jwt_required()
 

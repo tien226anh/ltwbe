@@ -2,6 +2,7 @@ import re
 from typing import List
 
 from bson.objectid import ObjectId
+from app.books.utils import to_json
 from db.init_db import get_collection_client
 
 client = get_collection_client("users")
@@ -31,7 +32,7 @@ async def get_users(filter_spec, skip: int, limit: int):
     offset = (skip - 1) * limit if skip > 0 else 0
     users = []
     async for new in client.find(filter_spec).sort("_id").skip(offset).limit(limit):
-        new = user_entity(new)
+        new = to_json(new)
         users.append(new)
 
     return users
@@ -48,7 +49,7 @@ async def get_user_by_id(id: ObjectId):
 async def get_user(id: str) -> dict:
     users = await client.find_one({"_id": ObjectId(id)})
     if users:
-        return user_entity(users)
+        return to_json(users)
 
 
 async def find_user_by_id(user_id: str):

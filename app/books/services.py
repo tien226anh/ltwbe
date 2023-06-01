@@ -27,6 +27,7 @@ async def find_by_id(id: str) -> dict:
     book_detail = await client.find_one({"_id": ObjectId(id)})
     if book_detail:
         book = to_json(book_detail)
+        # book = book_entity(book_detail)
         return book
 
 
@@ -38,8 +39,7 @@ async def find_books_by_filter_and_paginate(
     offset = (skip - 1) * limit if skip > 0 else 0
     books = []
     async for book in client.find(filter_books).sort("_id").skip(offset).limit(limit):
-        # book = to_json(book)
-        book = book_entity(book)
+        book = to_json(book)
         books.append(book)
     return books
 

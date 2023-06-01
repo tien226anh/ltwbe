@@ -1,7 +1,6 @@
-# Python version 3.10
+# Python version 3.10.11
 
-# Development
-
+## Development
 ```
 conda create --name v-osint python=3.10
 conda activate v-osint
@@ -16,8 +15,8 @@ ssh-keygen -t rsa -b 4096 -m PEM -E SHA512 -f secrets/PRIVATE_KEY
 openssl rsa -in secrets/PRIVATE_KEY -pubout -outform PEM -out secrets/PUBLIC_KEY
 ```
 
-# Run BE
+## Run BE
 ``` bash
 python main.py
 ```
-# ltwbe
+## ltwbe

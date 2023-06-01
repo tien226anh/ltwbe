@@ -1,3 +1,4 @@
+from functools import reduce
 from typing import Optional
 
 from bson import ObjectId
@@ -15,7 +16,7 @@ from app.books.services import (
     update_book,
     find_books_not_paginate,
 )
-from app.user.services import find_user_by_id
+from app.user.services import get_user
 
 # from fastapi_jwt_auth import AuthJWT
 
@@ -32,7 +33,7 @@ async def get_books(
     author: str = "",
     category: str = "",
     skip: int = 1,
-    limit: int = 20,
+    limit: int = 10,
 ):
     query = {}
     if title:
@@ -57,12 +58,49 @@ async def add_new_book(body: AddBookModel):
     )
 
 
-@router.get("/book_detail/{id}")
+@router.get("/book/{id}")
 async def get_detail(id: str):
     detail = await find_by_id(id)
     if detail:
-        return detail
+        return JSONResponse(status_code=status.HTTP_200_OK, content=detail)
     return HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not found")
+
+
+@router.get("/book/rate/{id}")
+async def get_book_rate(
+    book_id: str,
+):
+    book = await find_by_id(book_id)
+    all_rate = []
+    for item in book["rating"]:
+        all_rate.append(item["rate"])
+    average_rate = reduce(lambda a, b: a + b, all_rate) / len(all_rate)
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "average_rate": average_rate,
+        },
+    )
+
+
+@router.get("/book/comment/{id}")
+async def get_comment_rate(
+    book_id: str,
+):
+    book = await find_by_id(book_id)
+    all_comment = []
+    for item in book["rating"]:
+        user = await get_user(item["user_id"])
+        print(user["username"])
+        item["username"] = user["username"]
+        all_comment.append(item)
+
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "comment_rate": all_comment,
+        },
+    )
 
 
 @router.post("/cover")
@@ -116,7 +154,7 @@ async def rate_book(
 
 
 @router.put("/{book_id}")
-async def edit_book(book_id: str, data: BookModel = Body(...)):
+async def edit_book(book_id: str, data: UpdateModel = Body(...)):
     data = {k: v for k, v in data.dict().items() if v is not None}
     updated_book = await update_book(ObjectId(book_id), data)
     if updated_book is None:

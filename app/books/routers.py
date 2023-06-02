@@ -58,7 +58,7 @@ async def add_new_book(body: AddBookModel):
     )
 
 
-@router.get("/book/{id}")
+@router.get("/{id}")
 async def get_detail(id: str):
     detail = await find_by_id(id)
     if detail:
@@ -66,7 +66,7 @@ async def get_detail(id: str):
     return HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not found")
 
 
-@router.get("/book/rate/{id}")
+@router.get("/rate/{id}")
 async def get_book_rate(
     book_id: str,
 ):
@@ -83,7 +83,7 @@ async def get_book_rate(
     )
 
 
-@router.get("/book/comment/{id}")
+@router.get("/comment/{id}")
 async def get_comment_rate(
     book_id: str,
 ):
@@ -124,9 +124,9 @@ async def upload_cover(id: str, file: UploadFile = File(...)):
     )
 
 
-@router.put("/book/rate/{book_id}")
+@router.put("/rate/{id}")
 async def rate_book(
-    book_id: str,
+    id: str,
     rate_comment: RatingModel = Body(...),
     authorize: AuthJWT = Depends(),
 ):
@@ -134,7 +134,7 @@ async def rate_book(
     user_id = authorize.get_jwt_subject()
     rate = rate_comment.rating
     comment = rate_comment.comment
-    await rating_book(book_id, rate, comment, user_id)
+    await rating_book(id, rate, comment, user_id)
     return JSONResponse(
         status_code=status.HTTP_201_CREATED,
         content="Successfull rate the book",
@@ -153,10 +153,10 @@ async def rate_book(
 #     )
 
 
-@router.put("/{book_id}")
-async def edit_book(book_id: str, data: UpdateModel = Body(...)):
+@router.put("/{id}")
+async def edit_book(id: str, data: UpdateModel = Body(...)):
     data = {k: v for k, v in data.dict().items() if v is not None}
-    updated_book = await update_book(ObjectId(book_id), data)
+    updated_book = await update_book(ObjectId(id), data)
     if updated_book is None:
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=None)
 

@@ -83,6 +83,13 @@ async def rating_book(book_id: str, rate: float, comment: str, user_id: str):
     await client.update_one({"_id": book_id}, {"$set": {"rating": ratings}})
 
 
+async def book_delete(user_id: str):
+    result = await client.delete_one({"_id": ObjectId(user_id)})
+    if result.deleted_count > 0:
+        return True
+    return False
+
+
 def book_entity(book) -> dict:
     rating = []
     if "rating" in book:

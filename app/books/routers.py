@@ -8,6 +8,7 @@ from fastapi_jwt_auth import AuthJWT
 
 from app.books.models import AddBookModel, RatingModel, UpdateModel, BookModel
 from app.books.services import (
+    book_delete,
     count_books,
     create_book,
     find_books_by_filter_and_paginate,
@@ -160,4 +161,12 @@ async def edit_book(id: str, data: UpdateModel = Body(...)):
     if updated_book is None:
         return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=None)
 
+    return JSONResponse(status_code=status.HTTP_202_ACCEPTED, content=None)
+
+
+@router.delete("/{id}")
+async def delete_book(id: str):
+    deleted = await book_delete(id)
+    if deleted is not True:
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=None)
     return JSONResponse(status_code=status.HTTP_202_ACCEPTED, content=None)

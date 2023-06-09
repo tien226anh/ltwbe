@@ -34,5 +34,5 @@ class UpdateModel(BaseModel):
 
 
 class RatingModel(BaseModel):
-    rating: float
+    rate: float
     comment: str

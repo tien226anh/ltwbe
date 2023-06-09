@@ -73,35 +73,47 @@ async def get_book_rate(
 ):
     book = await find_by_id(book_id)
     all_rate = []
+    all_comment = []
+    if "rating" not in book:
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={
+                "average_rate": 0,
+                "comment_rate": [],
+            },
+        )
     for item in book["rating"]:
         all_rate.append(item["rate"])
+        user = await get_user(item["user_id"])
+        item["username"] = user["username"]
+        all_comment.append(item)
     average_rate = reduce(lambda a, b: a + b, all_rate) / len(all_rate)
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content={
             "average_rate": average_rate,
-        },
-    )
-
-
-@router.get("/comment/{id}")
-async def get_comment_rate(
-    book_id: str,
-):
-    book = await find_by_id(book_id)
-    all_comment = []
-    for item in book["rating"]:
-        user = await get_user(item["user_id"])
-        print(user["username"])
-        item["username"] = user["username"]
-        all_comment.append(item)
-
-    return JSONResponse(
-        status_code=status.HTTP_200_OK,
-        content={
             "comment_rate": all_comment,
         },
     )
+
+
+# @router.get("/comment/{id}")
+# async def get_comment_rate(
+#     book_id: str,
+# ):
+#     book = await find_by_id(book_id)
+#     all_comment = []
+#     for item in book["rating"]:
+#         user = await get_user(item["user_id"])
+#         item["username"] = user["username"]
+#         all_comment.append(item)
+
+#     return JSONResponse(
+#         status_code=status.HTTP_200_OK,
+#         content={
+#             "comment_rate": all_comment,
+#         },
+#     )
 
 
 @router.post("/cover")

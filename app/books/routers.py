@@ -69,9 +69,9 @@ async def get_detail(id: str):
 
 @router.get("/rate/{id}")
 async def get_book_rate(
-    book_id: str,
+    id: str,
 ):
-    book = await find_by_id(book_id)
+    book = await find_by_id(id)
     all_rate = []
     all_comment = []
     if "rating" not in book:

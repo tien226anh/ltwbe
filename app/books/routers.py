@@ -145,7 +145,7 @@ async def rate_book(
 ):
     authorize.jwt_required()
     user_id = authorize.get_jwt_subject()
-    rate = rate_comment.rating
+    rate = rate_comment.rate
     comment = rate_comment.comment
     await rating_book(id, rate, comment, user_id)
     return JSONResponse(

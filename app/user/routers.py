@@ -133,6 +133,7 @@ async def get_cart(authorize: AuthJWT = Depends()):
     for item in user["cart"]:
         book = await find_by_id(item["book_id"])
         item["title"] = book["title"]
+        item["cover"] = book["cover"]
         cart.append(item)
     return JSONResponse(
         status_code=status.HTTP_200_OK,
@@ -143,18 +144,11 @@ async def get_cart(authorize: AuthJWT = Depends()):
 
 
 @router.post("/cart")
-async def add_cart(books: List[CartModel] = Body(...), authorize: AuthJWT = Depends()):
+async def add_cart(books: CartModel = Body(...), authorize: AuthJWT = Depends()):
     authorize.jwt_required()
     user_id = ObjectId(authorize.get_jwt_subject())
-    list_books = []
-    for item in books:
-        list_books.append(
-            {
-                "book_id": item.book_id,
-                "booksnum": item.booksnum,
-            }
-        )
-    await add_to_cart(user_id, list_books)
+
+    await add_to_cart(user_id, books)
     return JSONResponse(
         status_code=status.HTTP_201_CREATED, content="Successful add to cart"
     )

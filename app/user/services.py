@@ -3,6 +3,7 @@ from typing import List
 
 from bson.objectid import ObjectId
 from app.books.utils import to_json
+from app.user.models import CartModel
 from db.init_db import get_collection_client
 
 client = get_collection_client("users")
@@ -57,15 +58,34 @@ async def find_user_by_id(user_id: str):
     return await client.find_one({"_id": user_id})
 
 
-async def add_to_cart(id: ObjectId, data: List[dict]):
-    return await client.update_one(
-        {"_id": id},
-        {
-            "$set": {
-                "cart": data,
-            }
-        },
+async def add_to_cart(id: ObjectId, data: CartModel):
+    existing_item = await client.find_one(
+        {"_id": id, "cart.book_id": data.book_id},
+        projection={"cart.$": 1},
     )
+    if existing_item:
+        existing_booksnum = existing_item["cart"][0]["booksnum"]
+        data.booksnum == existing_booksnum
+        await client.update_one(
+            {
+                "_id": id,
+                "cart.book_id": data.book_id,
+            },
+            {
+                "$set": {
+                    "cart.$.booksnum": data.booksnum,
+                }
+            },
+        )
+    else:
+        await client.update_one(
+            {"_id": id},
+            {
+                "$push": {
+                    "cart": data.dict(),
+                }
+            },
+        )
 
 
 async def delete_from_cart(user_id: ObjectId, book_id: str):

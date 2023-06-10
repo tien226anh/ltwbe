@@ -27,7 +27,6 @@ async def find_by_id(id: str) -> dict:
     book_detail = await client.find_one({"_id": ObjectId(id)})
     if book_detail:
         book = to_json(book_detail)
-        # book = book_entity(book_detail)
         return book
 
 

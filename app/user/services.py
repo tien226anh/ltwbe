@@ -47,9 +47,10 @@ async def get_user_by_id(id: ObjectId):
 
 
 async def get_user(id: str) -> dict:
-    users = await client.find_one({"_id": ObjectId(id)})
-    if users:
-        return to_json(users)
+    user_detail = await client.find_one({"_id": ObjectId(id)})
+    if user_detail:
+        user = to_json(user_detail)
+        return user
 
 
 async def find_user_by_id(user_id: str):
@@ -67,10 +68,14 @@ async def add_to_cart(id: ObjectId, data: List[dict]):
     )
 
 
-async def delete_from_cart(user_id: ObjectId, book_ids: List[ObjectId]):
+async def delete_from_cart(user_id: ObjectId, book_id: str):
     return await client.update_one(
         {"_id": user_id},
-        {"$pull": {"cart": {"book_id": {"$in": book_ids}}}},
+        {
+            "$pull": {
+                "cart": {"book_id": ObjectId(book_id)},
+            },
+        },
     )
 
 

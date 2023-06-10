@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 
 from app.auth.password import get_password_hash
+from app.books.services import find_by_id
 from app.books.utils import to_json
 from app.user.models import Role, UserCreateModel, UserUpdateModel, CartModel
 from app.user.services import (
@@ -12,6 +13,7 @@ from app.user.services import (
     create_user,
     delete_user,
     find_user_by_id,
+    get_user,
     get_users,
     update_user,
     user_entity,
@@ -115,6 +117,31 @@ async def delete(id: str):
     return JSONResponse(status_code=status.HTTP_202_ACCEPTED, content=None)
 
 
+@router.get("/cart")
+async def get_cart(authorize: AuthJWT = Depends()):
+    authorize.jwt_required()
+    user_id = ObjectId(authorize.get_jwt_subject())
+    user = await get_user(user_id)
+    cart = []
+    if "cart" not in user:
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={
+                "cart": [],
+            },
+        )
+    for item in user["cart"]:
+        book = await find_by_id(item["book_id"])
+        item["title"] = book["title"]
+        cart.append(item)
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "cart": cart,
+        },
+    )
+
+
 @router.post("/cart")
 async def add_cart(books: List[CartModel] = Body(...), authorize: AuthJWT = Depends()):
     authorize.jwt_required()
@@ -123,7 +150,7 @@ async def add_cart(books: List[CartModel] = Body(...), authorize: AuthJWT = Depe
     for item in books:
         list_books.append(
             {
-                "book_id": (ObjectId(item.book_id)),
+                "book_id": (item.book_id),
                 "booksnum": item.booksnum,
             }
         )
@@ -134,14 +161,13 @@ async def add_cart(books: List[CartModel] = Body(...), authorize: AuthJWT = Depe
 
 
 @router.delete("/cart")
-async def delete_cart_items(book_ids: List[str], authorize: AuthJWT = Depends()):
+async def delete_cart_items(book_id: str, authorize: AuthJWT = Depends()):
     authorize.jwt_required()
     user_id = ObjectId(authorize.get_jwt_subject())
-    book_object_ids = [ObjectId(book_id) for book_id in book_ids]
-    await delete_from_cart(user_id, book_object_ids)
-    return JSONResponse(
-        status_code=status.HTTP_200_OK, content="Successfully deleted items form cart"
-    )
+    user = await get_user(user_id)
+    print(user)
+    # await delete_from_cart(user_id, book_id)
+    return None
 
 
 @router.post("/avatar")

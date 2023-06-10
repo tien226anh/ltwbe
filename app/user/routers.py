@@ -150,7 +150,7 @@ async def add_cart(books: List[CartModel] = Body(...), authorize: AuthJWT = Depe
     for item in books:
         list_books.append(
             {
-                "book_id": (item.book_id),
+                "book_id": item.book_id,
                 "booksnum": item.booksnum,
             }
         )
@@ -160,14 +160,18 @@ async def add_cart(books: List[CartModel] = Body(...), authorize: AuthJWT = Depe
     )
 
 
-@router.delete("/cart")
+@router.delete("/cart/{book_id}")
 async def delete_cart_items(book_id: str, authorize: AuthJWT = Depends()):
     authorize.jwt_required()
     user_id = ObjectId(authorize.get_jwt_subject())
     user = await get_user(user_id)
-    print(user)
-    # await delete_from_cart(user_id, book_id)
-    return None
+    for item in user["cart"]:
+        if item["book_id"] == book_id:
+            await delete_from_cart(user_id, book_id)
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content="Succesful delete from cart",
+    )
 
 
 @router.post("/avatar")

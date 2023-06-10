@@ -73,7 +73,7 @@ async def delete_from_cart(user_id: ObjectId, book_id: str):
         {"_id": user_id},
         {
             "$pull": {
-                "cart": {"book_id": ObjectId(book_id)},
+                "cart": {"book_id": book_id},
             },
         },
     )

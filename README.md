@@ -14,7 +14,7 @@ openssl rsa -in secrets/PRIVATE_KEY -pubout -outform PEM -out secrets/PUBLIC_KEY
 #### Add data
 Tạo 1 database mới trong mongodb và đặt tên là "books_db". Tạo 2 collection khác có tên là "books" và "users".
 
-Nếu chưa có folder 'static' tạo folder 'static' cùng cấp với folder 'app', 'core', 'db. Kế đến tạo folder 'avatar' là ảnh đại diện của user và folder 'bookscover' là ảnh đại cover của quyển sách.
+Nếu chưa có folder 'static' tạo folder 'static' cùng cấp với folder 'app', 'core', 'db'. Kế đến tạo folder 'avatar' là ảnh đại diện của user và folder 'bookscover' là ảnh cover của sách.
 
 Tải dữ liệu sẵn ở đường link sau: https://drive.google.com/file/d/1Em-FHHMWgCRrHGx-ZnKWtklq44r4tHDf/view?usp=sharing
 
@@ -24,8 +24,8 @@ Import data ở file books_db.books.json vào collection books.
 Import data ở file books_db.users.json vào collection users.
 #### If using `conda` (Recommend)
 ```bash
-conda create --name v-osint python=3.10
-conda activate v-osint
+conda create --name bookdb python=3.10
+conda activate bookdb
 ```
 
 Install python lib
